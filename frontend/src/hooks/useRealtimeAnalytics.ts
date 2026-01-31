@@ -8,12 +8,11 @@ const useRealtimeAnalytics = () => {
   const [totalPlaying, setTotalPlaying] = useState(0);
 
   useEffect(() => {
-    socket.connect();
+    if (!socket.connected) {
+      socket.connect(); 
+    }
 
-    const handler = (data: {
-      totalGames: number;
-      totalPlaying: number;
-    }) => {
+    const handler = (data: { totalGames: number; totalPlaying: number }) => {
       setTotalGames(data.totalGames);
       setTotalPlaying(data.totalPlaying);
     };

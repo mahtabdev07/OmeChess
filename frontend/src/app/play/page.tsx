@@ -4,14 +4,31 @@ import ChessBoard from "@/components/ChessBoard";
 import useGame from "@/hooks/useGame";
 
 const Play = () => {
-  const { gameState, color, fen, gameResult, moves, handlePlayOnline, socket } =
-    useGame();
+  const {
+    gameState,
+    color,
+    fen,
+    gameResult,
+    moves,
+    handlePlayOnline,
+    socket,
+    isConnected,
+  } = useGame();
 
   return (
     <div className="bg-[#302E2B] min-h-screen text-white flex flex-col items-center">
-      <section className="grid grid-cols-1 ml-20 lg:grid-cols-2 items-center max-w-7xl w-full px-4 mt-14">
+      <section
+        className="
+          grid grid-cols-1 lg:grid-cols-2 
+          items-center 
+          max-w-7xl w-full 
+          px-4 mt-14
+          gap-8 lg:gap-0
+          lg:ml-20
+        "
+      >
         {/* Chess Board */}
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex items-center justify-center w-full">
           <ChessBoard
             fen={fen}
             socket={socket}
@@ -21,14 +38,27 @@ const Play = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="flex flex-col items-center w-full max-w-sm bg-[#262522] h-[calc(100vh-120px)] rounded-lg shadow-lg ml-18">
-          <header className="font-bold text-3xl flex items-center rounded-lg justify-center gap-3 bg-[#21201D] py-4 w-full">
+        <div
+          className="
+            flex flex-col items-center 
+            w-full max-w-sm 
+            bg-[#262522] 
+            rounded-lg shadow-lg
+            mx-auto
+            lg:ml-18
+            h-auto lg:h-[calc(100vh-120px)]
+          "
+        >
+          <header className="font-bold text-3xl flex items-center justify-center gap-3 bg-[#21201D] py-4 w-full rounded-t-lg">
             <img src="/play.svg" alt="play" className="w-8" />
             Play Chess
           </header>
+
           <section className="px-4 py-5 w-full">
             {gameState === "menu" && (
-              <Button onClick={handlePlayOnline}>Find Match</Button>
+              <Button disabled={!isConnected} onClick={handlePlayOnline}>
+                Find Match
+              </Button>
             )}
 
             {gameState === "waiting" && (
@@ -48,18 +78,15 @@ const Play = () => {
                 <p className="text-lg font-semibold mb-2 pb-1 border-b border-zinc-100/10">
                   Moves
                 </p>
+
                 {moves.length === 0 ? (
                   <p className="text-sm text-zinc-400">No moves yet</p>
                 ) : (
                   <div className="space-y-1">
                     {moves.map((move, index) => {
-                      // Only render odd indexes to avoid duplicates
                       if (index % 2 === 0) {
                         return (
-                          <div
-                            key={index}
-                            className={`flex items-center gap-16 text-md`}
-                          >
+                          <div key={index} className="flex items-center gap-10 text-md">
                             <span className="text-gray-400 w-8">
                               {Math.floor(index / 2) + 1}.
                             </span>
@@ -84,7 +111,9 @@ const Play = () => {
             {gameState === "gameOver" && (
               <div className="text-center space-y-4">
                 <p className="text-2xl font-bold">{gameResult}</p>
-                <Button onClick={handlePlayOnline}>Play Again</Button>
+                <Button disabled={!isConnected} onClick={handlePlayOnline}>
+                  Play Again
+                </Button>
               </div>
             )}
           </section>

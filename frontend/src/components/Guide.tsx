@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 interface GuideProps {
   message: string;
   imageSrc?: string;
-  onComplete?: () => void; // Added callback prop
+  onComplete?: () => void;
 }
 
 /**
@@ -20,12 +20,23 @@ const normalizeForSpeech = (text: string) => {
     .replace(/\? /g, ", ");
 };
 
+/**
+ * Detect mobile devices
+ */
+const isMobileDevice = () => {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+};
+
 const Guide = ({ message, imageSrc, onComplete }: GuideProps) => {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const hasSpoken = useRef(false);
 
   const speakMessage = (text: string) => {
+    // ❌ Disable voice on mobile
+    if (isMobileDevice()) return;
+
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
@@ -45,10 +56,8 @@ const Guide = ({ message, imageSrc, onComplete }: GuideProps) => {
     utterance.pitch = 1;
     utterance.volume = 1;
 
-    // --- NEW: Trigger onComplete when speech finishes ---
     utterance.onend = () => {
       if (onComplete) {
-        // Wait 1.5s after speaking finishes so the user can read the last words
         setTimeout(() => {
           onComplete();
         }, 1500);
@@ -63,7 +72,6 @@ const Guide = ({ message, imageSrc, onComplete }: GuideProps) => {
     setIsTyping(true);
     hasSpoken.current = false;
 
-    // Start voice immediately
     const speechTimeout = setTimeout(() => {
       if (!hasSpoken.current) {
         speakMessage(message);
@@ -71,7 +79,6 @@ const Guide = ({ message, imageSrc, onComplete }: GuideProps) => {
       }
     }, 10);
 
-    // Typing animation (visual only)
     let currentLength = 0;
     let typingInterval: NodeJS.Timeout;
 
@@ -99,7 +106,7 @@ const Guide = ({ message, imageSrc, onComplete }: GuideProps) => {
     <motion.div
       initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.5 } }} // --- NEW: Exit animation ---
+      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.5 } }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="fixed top-4 left-4 z-50 flex items-start gap-3 max-w-sm sm:max-w-md pointer-events-none"
     >

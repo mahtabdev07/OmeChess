@@ -86,11 +86,12 @@ const useGame = () => {
   }, [socket]);
 
   const handlePlayOnline = () => {
-    if (!socket || !isConnected) {
-      alert("Not connected to server");
+    if (!isConnected) {
+      alert("Connecting to server… please wait");
       return;
     }
-    socket.emit(INIT_GAME);
+
+    socket.emit("init_game");
   };
 
   return {
@@ -101,6 +102,7 @@ const useGame = () => {
     moves,
     handlePlayOnline,
     socket,
+    isConnected
   };
 };
 

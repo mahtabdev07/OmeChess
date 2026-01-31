@@ -31,6 +31,8 @@ const gameManager = new GameManager(io);
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  socket.emit("analytics:update", gameManager.getAnalytics());
+
   gameManager.addUser(socket);
 
   socket.on("disconnect", () => {
